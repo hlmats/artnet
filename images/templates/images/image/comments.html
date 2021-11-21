@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}All Comments{% endblock %}
+
+{% block content %}
+  <h1>All Comments to {{image.title}}</h1>
+  
+
+
+
+  
+    
+  <div>
+	{% with comments.count as total_comments %}
+		<h4>{{ total_comments }} comment{{ total_comments|pluralize }}</h4>
+	{% endwith %}
+	
+	{% for comment in comments %}
+		<div>
+			<p>
+				Comment {{ forloop.counter }} by <a href="{{ comment.user.get_absolute_url }}">{{ comment.user.get_full_name }}</a>
+				{{ comment.created }}{% if image.user == request.user %} (<a href="{% url 'images:delete_comment' comment_id %}">delete</a> this comment){% endif %}:
+			</p>
+           {{ comment.body|linebreaks }}
+		</div>
+	{% endfor %}	
+	
+   </div>
+{% endblock %}
+
+

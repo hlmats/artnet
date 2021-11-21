@@ -1,0 +1,75 @@
+{% load thumbnail %}
+
+{% with user=action.user profile=action.user.profile %}
+<div class="action">
+
+
+
+<div class="container">
+
+
+<div class="new_act">
+
+<div class="row">
+
+<div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+
+    
+      {% thumbnail user.profile.photo|default:'img/sky.png' "70x70" crop="100%" as im %}
+      <a href="{{ user.get_absolute_url }}">
+        <img src="{{ im.url }}"
+         class="new-us">
+      </a>
+    
+
+
+</div>
+<div class="col-lg-6 col-md-6 col-sm-6 col-xs-0">
+
+    <p>
+      <span class="date">{{ action.created|timesince }} ago</span>
+      <br />
+      <a href="{{ user.get_absolute_url }}">
+        {{ user.get_full_name }}
+      </a>
+      {{ action.verb }}
+      {% if action.target %}
+        {% with target=action.target %}
+          <a href="{{ target.get_absolute_url }}">{{ target }}</a>
+        {% endwith %}
+      {% endif %}
+    </p>
+
+</div>
+<div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+
+
+
+    {% if action.target %}
+      {% with target=action.target %}
+        {% if target.image %}
+          {% thumbnail target.image "80x80" crop="100%" as im %}
+          <a href="{{ target.get_absolute_url }}">
+            <img src="{{ im.url }}" class="new-img">
+          </a>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
+
+</div>
+
+
+
+</div>
+
+</div>
+
+
+</div>
+
+ 
+  
+  
+
+</div>
+{% endwith %}

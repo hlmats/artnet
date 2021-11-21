@@ -1,0 +1,30 @@
+{% load thumbnail %}
+
+<div class="container">		
+	<div class="card-deck">
+		{% for image in images %}
+		<div style="padding: 12px;">		
+			<div class="card" style="width: 300;">
+				<a href="{{ image.get_absolute_url }}">
+					{% thumbnail image.image 300x300 crop="smart" as im %}
+					<a href="{{ image.get_absolute_url }}">
+						<img src="{{ im.url }}">
+					</a>
+				</a>
+				<div class="card-body">
+					<h5 class="card-title"><span style="font-weight: bold;">{{ image.title }}</span></h5>
+					<p class="card-text">By: <a href="{{ image.user.get_absolute_url }}">{{ image.user.get_full_name }}</a></p>
+					<a href="{{ image.get_absolute_url }}" class="title">{{ image.title }}</a>
+				</div>
+			</div>			
+		</div>		
+		{% endfor %}
+	</div>				
+</div>
+
+
+
+
+
+
+

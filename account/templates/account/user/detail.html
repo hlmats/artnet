@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+{% load static %}
+
+{% block title %}{{ user.get_full_name }}{% endblock %}
+
+{% block content %}
+  <h1>{{ user.get_full_name }}</h1>
+   
+  <div class="profile-info">
+    <img src="{% thumbnail user.profile.photo|default:'img/sky.png' 80x80 crop="smart" %}" class="user-detail">
+  </div>
+  
+  <div class="about">{{ user.profile.about }}</div>
+    
+  
+	
+  {% with total_followers=user.followers.count %}
+    <span class="count">
+      <span class="total">{{ total_followers }}</span>
+      follower{{ total_followers|pluralize }}
+    </span>
+	{% if user.get_full_name != request.user.get_full_name %}
+    <a href="#" data-id="{{ user.id }}" data-action="{% if request.user in user.followers.all %}un{% endif %}follow" class="follow button">
+      {% if request.user not in user.followers.all %}
+        Follow
+      {% else %}
+        Unfollow
+      {% endif %}
+    </a>
+	{% endif %}
+	
+	{% with total_images=images.count %}  
+      <div class="numb_im">{{ total_images }}
+      painting{{ total_images|pluralize }}:
+      </div>
+    {% endwith %}
+	
+    <div id="image-list" class="image-container">
+      {% include "images/image/list_ajax.html" with images=images %}
+    </div>
+	
+	{% with total_images=not_active_images.count %}
+	{% if total_images > 0 %}
+	  <div>
+	  You can activate you painting{{ total_images|pluralize }}:
+	  <ul>
+		{% for image in not_active_images %}
+		  <li><a href="{% url 'images:activate_painting' image.id %}">{{image.title}}</a></li>
+		{% endfor %}
+      </ul>	  
+	  </div>
+	{% endif %}
+	{% endwith %}
+	
+  {% endwith %}
+  
+  {% if user.get_full_name == request.user.get_full_name %}
+	<p><a href="{% url 'edit_mypage' %}" class="us button">Edit Page</a></p>
+  {% endif %}
+  
+  
+{% endblock %}
+
+{% block domready %}
+  $('a.follow').click(function(e){
+    e.preventDefault();
+    $.post('{% url "user_follow" %}',
+      {
+        id: $(this).data('id'),
+        action: $(this).data('action')
+      },
+      function(data){
+        if (data['status'] == 'ok') {
+          var previous_action = $('a.follow').data('action');
+
+          // toggle data-action
+          $('a.follow').data('action',
+            previous_action == 'follow' ? 'unfollow' : 'follow');
+          // toggle link text
+          $('a.follow').text(
+            previous_action == 'follow' ? 'Unfollow' : 'Follow');
+
+          // update total followers
+          var previous_followers = parseInt(
+            $('span.count .total').text());
+          $('span.count .total').text(previous_action == 'follow' ?
+          previous_followers + 1 : previous_followers - 1);
+        }
+      }
+    );
+  });
+{% endblock %}

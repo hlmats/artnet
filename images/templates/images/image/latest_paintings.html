@@ -1,0 +1,7 @@
+<ul>
+{% for painting in latest_paintings %}
+  <li>
+    <a href="{{ painting.get_absolute_url }}">{{ painting.title }}</a>
+  </li>
+{% endfor %}
+</ul>

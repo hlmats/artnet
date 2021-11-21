@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmation of deletion of Profile.{% endblock %}
+
+{% block content %}
+  <h1>Are you sure you want to delete the Profile?</h1>
+  <ul>
+    <li><a href="{% url 'delete_profile' %}">Yes</a></li>
+    <li><a href="{{ request.user.get_absolute_url }}">No</a></li>
+  </ul>  
+
+{% endblock %}

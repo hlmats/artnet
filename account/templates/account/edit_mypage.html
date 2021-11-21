@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Edit your Page{% endblock %}
+
+{% block content %}
+  <h1>Edit your Page</h1>
+  <p>You can <a href="{% url 'edit' %}">edit your profile</a></p>
+  <p>You can <a href="{% url 'confirm_delete_profile' %}">delete your profile</a></p>
+  {% if paintings %}
+  <p>or you can edit/deactivate/delete your paintings:</p>
+  {% endif %}
+  <ul>
+	{% for painting in paintings %}
+		<li><a href="{% url 'images:edit_painting' painting.id %}">{{ painting.title }}</a></li>
+	{% endfor %}
+  </ul>
+{% endblock %}

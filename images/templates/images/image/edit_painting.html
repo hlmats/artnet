@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Painting{% endblock %}
+
+{% block content %}
+  <h1>Deactivate Painting</h1>
+    <a href="{% url 'images:deactivate_painting' painting_id %}">Deactivate</a>
+  <h1>Delete Painting</h1>
+    <a href="{% url 'images:confirm_delete_painting' painting_id %}">Delete</a>
+  <h1>Edit Painting</h1>
+	<form action="." method="post" enctype="multipart/form-data" >
+      {{ form.as_p }}
+      {% csrf_token %}
+      <input type="submit" value="Load">
+    </form>
+
+{% endblock %}

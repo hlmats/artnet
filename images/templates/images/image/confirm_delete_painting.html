@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmation of deletion of Painting.{% endblock %}
+
+{% block content %}
+  <h1>Are you sure you want to delete the Painting?</h1>
+  <ul>
+    <li><a href="{% url 'images:delete_painting' image.id %}">Yes</a></li>
+    <li><a href="{% url 'images:detail' image.id image.slug %}">No</a></li>
+  </ul>  
+
+{% endblock %}

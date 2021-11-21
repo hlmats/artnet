@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Download your Painting{% endblock %}
+
+{% block content %}
+  <h1>Download your Painting</h1>
+  <form action="." method="post" enctype="multipart/form-data" >
+    {{ form.as_p }}
+    {% csrf_token %}
+    <input type="submit" value="Download it!">
+  </form>
+{% endblock %}

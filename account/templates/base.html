@@ -1,0 +1,111 @@
+{% load images_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link href="{% static "css/base.css" %}" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #87cefa;">
+    <span class="navbar-brand" style="color: blue; font-size:36px;" >The Artists Network</span>                      
+	  {% if request.user.is_authenticated %}
+	    <ul class="navbar-nav mr-auto">                                
+		  <li class="nav-item">
+			<a class="nav-link" style="color: blue" href="{% url 'news' %}">New Activities</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" style="color: blue" href="{% url 'images:list' %}">Paintings</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" style="color: blue" href="{% url 'user_list' %}">Artists</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" style="color: blue" href="{{ request.user.get_absolute_url }}">My Page</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" style="color: blue" href="{% url 'images:styles' %}">Styles</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" style="color: blue" href="{% url 'i_follow' %}">Artists I follow</a>
+		  </li>
+	    </ul>
+	    <ul class="navbar-nav ml-auto">										
+		  <li class="nav-item">
+		    <a class="nav-link" style="color: blue" href="#">Hello, {{ request.user.first_name }}!</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" style="color: blue" href="{% url 'logout' %}">Log Out</a>
+		  </li>					
+	    </ul>
+	  
+	  {% endif %}           
+  </nav>
+
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="{{ message.tags }}">
+          {{ message|safe }}
+            <a href="#" class="close">x</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+
+
+  <div class="row">
+    {% if request.user.is_authenticated %}
+	  <div class="sidebar2 col-lg-3 col-md-4 col-sm-4 col-xs-4">
+	    <h5>Latest Paintings:</h5>
+		{% show_latest_paintings 3 %}
+		<h5>Most popular Paintings:</h5>
+		{% show_most_liked_paintings 3 %}
+		
+		<h5>
+		You can <a href="{% url "edit" %}">edit your profile</a>
+		or <a href="{% url "password_change" %}">change your password</a>.
+		</h5>
+		
+	  </div>
+	  <div class="content col-lg-9 col-md-8 col-sm-8 col-xs-8">
+    {% else %}
+	  <div class="sidebar1 col-lg-1 col-md-1 col-sm-1 col-xs-1">
+	  </div>
+	  <div class="content col-lg-11 col-md-11 col-sm-11 col-xs-11">
+	{% endif %}
+	  {% block content %}{% endblock %}
+	  </div>
+  </div>
+	
+
+ 
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+  <script>
+    var csrftoken = Cookies.get('csrftoken');
+    function csrfSafeMethod(method) {
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+      }
+    });
+
+    $(document).ready(function(){
+      {% block domready %}
+      {% endblock %}
+    });
+  </script>
+
+</body>
+</html>

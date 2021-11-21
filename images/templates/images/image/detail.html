@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}{{ image.title }}{% endblock %}
+
+{% block content %}
+  <h1>{{ image.title }}</h1>
+  <h5>Artist: <a href="{{ user.get_absolute_url }}">{{ image.user.get_full_name }}</a></h5>
+  <h5>Style: <a href="{% url 'images:list_style' image.style %}">{{ image.style }}</a></h5>
+
+
+<div class="row">
+<div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+  {% load thumbnail %}
+    <a href="{{ image.image.url }}">
+      <img src="{% thumbnail image.image 300x0 %}" class="image-detail">
+    </a>
+</div>
+<div class="col-lg-7 col-md-7 col-sm-7 col-xs-0">	
+	{{ image.description|linebreaks }}
+</div>	
+</div>
+
+	
+<div>
+{% with total_likes=image.total_likes users_like=image.users_like.all %}
+    <span class="count">
+	  <span  class="total">{{ total_likes }}</span>
+	  like{{ total_likes|pluralize }}
+	</span>
+	{% if image.user.get_full_name != request.user.get_full_name %}
+	<a href="#" data-id="{{ image.id }}" data-action="{% if request.user in users_like %}un{% endif %}like" class="like button">
+	  {% if request.user not in users_like %}
+		Like
+	  {% else %}
+		Unlike
+	  {% endif %}
+	</a>
+	{% endif %}
+{% endwith %}
+</div>
+
+
+		
+<div>
+{% with users_like=image.users_like.all %}
+  <div class="image-likes">
+    {% for user in users_like %}
+      <div>
+		<p><a href="{{ user.get_absolute_url }}">{{ user.get_full_name }}</a> liked the Painting</p>	
+      </div>
+    {% empty %}
+      Nobody likes this image yet.
+    {% endfor %}
+  </div>
+{% endwith %}
+</div>
+  
+    
+<div>
+	{% with comments.count as total_comments %}
+	{% if total_comments %}
+		<h4>The first {{ total_comments }} comment{{ total_comments|pluralize }}</h4>
+	
+	{% for comment in comments %}
+		<div>
+			<p>
+				Comment {{ forloop.counter }} by <a href="{{ comment.user.get_absolute_url }}">{{ comment.user.get_full_name }}</a>
+				{{ comment.created }}{% if image.user == request.user %} (<a href="{% url 'images:delete_comment' comment.id %}">delete</a> this comment){% endif %}:
+			</p>
+			{{ comment.body|linebreaks }}
+		</div>
+	{% endfor %}
+	{% else %}
+		<p>There are no comments yet.</p>
+	{% endif %}
+	
+	{% if total_comments == 3 %}
+	<h4><a href="{% url 'images:all_comments' image.id %}">See all Comments</a></h4>
+	{% endif %}
+	{% endwith %}
+	
+	{% if image.user.get_full_name != request.user.get_full_name %}
+	  {% if new_comment %}
+		<h2>Your comment has been added.</h2>
+	  {% else %}
+	    <h3>Add a new comment</h3>
+		<form action="." method="post">
+		  {{ comment_form.as_p }}
+		  {% csrf_token %}
+		  <p><input type="submit" value="Add comment"></p>
+		</form>
+	  {% endif %}
+	{% endif %}	
+</div>
+{% endblock %}
+
+
+{% block domready %}
+  $('a.like').click(function(e){
+    e.preventDefault();
+    $.post('{% url "images:like" %}',
+      {
+        id: $(this).data('id'),
+        action: $(this).data('action')
+      },
+      function(data){
+        if (data['status'] == 'ok') {
+          var previous_action = $('a.like').data('action');
+
+          // toggle data-action
+          $('a.like').data('action',
+            previous_action == 'like' ? 'unlike' : 'like');
+          // toggle link text
+          $('a.like').text(
+            previous_action == 'like' ? 'Unlike' : 'Like');
+
+          // update total likes
+          var previous_likes = parseInt(
+            $('span.count .total').text());
+          $('span.count .total').text(previous_action == 'like' ?
+          previous_likes + 1 : previous_likes - 1);
+        }
+      }
+    );
+  });
+{% endblock %}
